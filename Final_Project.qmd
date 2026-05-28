@@ -1,0 +1,780 @@
+---
+title: 'Assignment 9 - LDA, Logistic Regression, and Random Forest'
+author: 'Egla Mekonnen '
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: xelatex
+    include-in-header:
+      text: |
+        \usepackage{fontspec,graphicx,multirow}
+        \setmainfont{Avenir Light}
+        \usepackage{microtype}
+        \emergencystretch=2em
+        \usepackage[hyphens]{url}
+        \usepackage{hyperref}
+        \hypersetup{breaklinks=true}
+        \usepackage{ragged2e}
+        \usepackage{etoolbox}
+        \usepackage{fvextra}
+        \usepackage[margin=1 in]{geometry}
+        \fvset{breaklines=true,breakanywhere=true}
+        \usepackage{listings}
+        \lstset{breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true}
+        \usepackage{caption}
+        \captionsetup[table]{labelformat=empty}
+        \AtBeginEnvironment{verbatim}{\scriptsize}
+---
+
+```{r, include=FALSE}
+
+
+library(reticulate)
+
+use_python("/Users/eglatesfu/.virtualenvs/r-env/bin/python", required = TRUE)
+py_config()
+
+py_install(
+  c("numpy", "pandas", "matplotlib", "seaborn", "scikit-learn"),
+  envname = "r-env"
+)
+```
+
+```{python,echo=FALSE}
+
+# setup
+import numpy as np                 # numerical arrays and linear algebra
+import pandas as pd                # dataframes and data manipulation
+import seaborn as sns              # statistical plotting
+import matplotlib.pyplot as plt    # general plotting
+
+from sklearn.model_selection import train_test_split, cross_val_score   # split data and run cross validation
+from sklearn.preprocessing import StandardScaler                         # scale features to zero mean and unit variance
+from sklearn.linear_model import LogisticRegression                      # logistic regression classifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis     # lda classifier
+from sklearn.neighbors import KNeighborsClassifier                       # knn classifier
+from sklearn.metrics import (                                            # evaluation functions
+    confusion_matrix,               # compute confusion matrix
+    classification_report,          # precision, recall, f1 summary
+    accuracy_score,                 # overall accuracy
+    RocCurveDisplay,                # convenient roc plotting helper
+    roc_auc_score                   # compute area under roc curve
+)
+
+sns.set(style='whitegrid', context='paper')   # set seaborn visual theme 
+pd.set_option('display.width', 120)          # widen console output for dataframes
+pd.set_option('display.max_columns', 20)     # allow more dataframe columns to print
+
+```
+
+## Dataset Description
+
+The dataset is from the OSMI (Open Sourcing Mental Illness) 2016 survey of mental health in the tech industry. It contains responses from 1,433 tech professionals worldwide regarding their mental health experiences, workplace environment, and demographic information.
+
+-   **Source:** Kaggle dataset:<https://www.kaggle.com/datasets/osmi/mental-health-in-tech-survey>
+
+-   **Purpose of the survey:** To investigate the likelihood of mental health issues in the tech industry, workplace policies, and personal attitudes toward mental health.
+
+-   **Observations and variables:** **Rows:** 1259 survey responses (each row = one respondent)
+
+    **Columns:** 27 variables, including demographics, employment characteristics, workplace attitudes, and personal/family mental health history.
+
+-   **Suitability for this project:** The dataset is well suited for binary classification because it has a yes/no target variable about whether someone has sought mental-health treatment, along with both categorical and numeric predictors. It also works well for inference methods like logistic regression and bootstrapping.
+
+```{python,echo=FALSE }
+
+
+# Load the dataset
+file_path = '/Users/eglatesfu/Desktop/survey.csv'  
+df = pd.read_csv(file_path)
+
+# Inspect the dataset
+print("Shape of dataset:", df.shape)
+
+```
+
+## Research Question
+
+“Can we predict whether a tech employee has seeked mental health treatment based on workplace factors, demographics, and mental health attitudes?”
+
+\*\* Predicting Treatment \*\*
+
+#### Meaningful Predictors
+
+-   Age
+
+-   Gender
+
+-   Family history
+
+-   Work interference
+
+-   Remote work
+
+-   Tech company
+
+-   Benefits
+
+-   Care options
+
+-   Wellness program
+
+-   Leave
+
+-   Supervisor support
+
+-   observed consequences
+
+```{python, include =FALSE}
+
+df.info()
+
+
+
+```
+
+```{python,include=FALSE }
+df.isna().sum()
+```
+
+#### Cleaning Data
+
+-   Dropping columns with too many missing value that have less importance to predicting Treatment
+
+#### Handling Missing values
+
+-   Self_employed - only have 18 missing value , so we reaplace NaN with common value
+
+```{python,echo=FALSE }
+df['self_employed'] = df['self_employed'].fillna(df['self_employed'].mode()[0])
+
+```
+
+-   Work_interfere : is More complicated to fill missing value bacause the answers contains Never, Rarely, Sometime, Often and NaN are replaced unknown.
+
+One-Hot encoding
+
+```{python}
+df['work_interfere'] = df['work_interfere'].fillna('Unknown')
+df = pd.get_dummies(df, columns=['work_interfere'], drop_first=True)
+# one category is omitted from the resulting DataFrame. This omitted category becomes the reference category (or baseline). Work_inetreference_never is the baseline 
+```
+
+```{python}
+# convert blooan to numeric values
+
+bool_cols = ['work_interfere_Often', 'work_interfere_Rarely',
+             'work_interfere_Sometimes', 'work_interfere_Unknown']
+
+df[bool_cols] = df[bool_cols].astype(int)
+
+```
+
+Country column have multiple values so to turn this in to a numeric category
+
+-   normalize -\> covert United States ==1 , other == 0
+
+```{python, echo=FALSE}
+df['Country'] = df['Country'].str.lower().str.strip()
+
+df['Country_US'] = (df['Country'] == 'united states').astype(int)
+
+```
+
+```{python}
+df = df.drop(columns=['comments', 'state', 'Timestamp', 'Country' ], errors='ignore')
+```
+
+```{python, echo=FALSE}
+yes_no_cols = ['family_history', 'treatment', 'remote_work', 'tech_company',
+               'benefits', 'care_options', 'wellness_program', 'seek_help',
+               'anonymity', 'self_employed']
+
+for col in yes_no_cols:
+    if col in df.columns:
+        df[col] = df[col].map({'Yes': 1, 'No': 0})  # everything else becomes NaN automatically
+
+
+# fill created NaN values after convertion with common value 
+for col in yes_no_cols:
+    if col in df.columns:
+        df[col] = df[col].fillna(df[col].mode()[0])
+
+
+```
+
+-   Handle inconsistent categorical responses
+
+```{python , echo=FALSE}
+
+# Convert to string so .str works
+df['Gender'] = df['Gender'].astype(str).str.strip().str.lower()
+
+# Standardize male/female responses
+male_terms = ['male','m','man','male-ish','maile','mal','msle']
+female_terms = ['female','f','woman','femake','femail','female ']
+
+df['Gender'] = df['Gender'].replace(male_terms, 'male')
+df['Gender'] = df['Gender'].replace(female_terms, 'female')
+
+# Everything else → "other"
+df.loc[~df['Gender'].isin(['male','female']), 'Gender'] = 'other'
+
+# Replace "other" with most common gender
+common_gender = df['Gender'].mode()[0]
+df.loc[df['Gender'] == 'other', 'Gender'] = common_gender
+
+# Convert final values to numbers
+df['Gender'] = df['Gender'].map({'male': 1, 'female': 0})
+
+
+```
+
+```{python,echo=FALSE}
+
+df.isna().sum()
+
+```
+
+Exploratory Data Analysis on clean data
+
+```{python, echo=FALSE}
+
+# Number of rows and columns
+print("Dataset shape:", df.shape)
+
+# Summary statistics for numeric columns
+print(df.describe())
+
+# Info about datatypes
+print(df.info())
+
+```
+
+Correlation between predictors
+
+```{python,include =FALSE}
+X = df.select_dtypes(include='number').drop(columns=['treatment'])
+numeric_df = df.select_dtypes(include='number')
+numeric_df.head()
+
+```
+
+```{python,include =FALSE}
+corr = numeric_df.corr()
+
+corr = numeric_df.corr()
+print(corr)
+
+
+```
+
+```{python, echo=FALSE}
+plt.figure(figsize=(12, 10))
+sns.heatmap(
+    corr.drop(columns=['treatment']).drop(index=['treatment']),
+    cmap='coolwarm',
+    annot=False,
+    linewidths=0.5
+)
+plt.title("Correlation Heatmap of Numeric Predictors")
+plt.tight_layout()
+plt.show()
+
+```
+
+Moderate Correction Between predictors
+
+-   wellness_program and seek_help → **0.596**
+
+-   wellness_program and care_options → **0.307**
+
+-   seek_help and care_options → **0.332**
+
+#### Features and Targets
+
+Target is Treatment ( 1 = Received Treatment, 0= did not receive Treatment
+
+```{python,echo=FALSE }
+
+# Select features (all numeric columns except target)
+features = [
+    'Age', 'Gender', 'self_employed', 'family_history',
+    'remote_work', 'tech_company', 'benefits', 'care_options',
+    'wellness_program', 'seek_help',
+    'work_interfere_Often', 'work_interfere_Rarely',
+    'work_interfere_Sometimes', 'work_interfere_Unknown',
+    'Country_US'
+]
+
+X = df[features]
+y = df['treatment']
+
+```
+
+```{python, echo=FALSE}
+plt.figure(figsize=(6,4))
+sns.countplot(x='treatment', data=df)
+plt.title("Distribution of Treatment (Target)")
+plt.xlabel("Treatment (0 = No, 1 = Yes)")
+plt.ylabel("Count")
+plt.show()
+
+# Percentages
+print(df['treatment'].value_counts(normalize=True) * 100)
+
+```
+
+This shows a balanced dataset, the two classes are close to each other
+
+```         
+treatment
+1    50.595711
+0    49.404289
+```
+
+```{python, include=FALSE }
+binary_features = [
+    'Gender', 'self_employed', 'family_history', 'remote_work', 'tech_company',
+    'work_interfere_Often', 'work_interfere_Rarely', 'work_interfere_Sometimes',
+    'work_interfere_Unknown', 'Country_US'
+]
+
+for col in binary_features:
+    plt.figure(figsize=(6,4))
+    sns.countplot(x=col, data=df)
+    plt.title(f"Distribution of {col}")
+    plt.show()
+
+
+```
+
+Relationship between Features and Target Variables
+
+```{python, include=FALSE}
+# Categorical features vs treatment
+for col in binary_features:
+    plt.figure(figsize=(6,4))
+    sns.countplot(x=col, hue='treatment', data=df)
+    plt.title(f"{col} vs Treatment")
+    plt.show()
+
+
+
+
+```
+
+#### Interpretation of Plot( after plotting each relationship) 
+
+-   Gender has a weak relationship with treatment.
+
+-   Being self-employed does **not strongly affect** seeking mental health treatment. (Weak predictor.)
+
+-   Family history is a **strong predictor**.
+
+-   People with family history of mental illness are much more likely to seek treatment.
+
+-   Remote work has **little to no effect** on treatment. (Matches low correlation.)
+
+-   Working in a tech company does **not strongly predict** treatment.
+
+-   Country_US is a **moderate predictor** of treatment
+
+Splitting data , Train-test split
+
+```{python}
+# Target column
+y = df['treatment']  # your target is 'treatment'
+
+# Features: select all numeric columns except the target
+X = df.select_dtypes(include='number').drop(columns=['treatment'])
+
+
+
+```
+
+```{python}
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+```
+
+Scaling
+
+```{python,include =FALSE }
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# inspect scaled data 
+
+X_train_scaled[:5,:5], X_test_scaled[:5,:5]
+
+```
+
+Building Logistic regression
+
+```{python}
+from sklearn.linear_model import LogisticRegression
+
+log_reg = LogisticRegression(random_state=42)
+log_reg.fit(X_train_scaled, y_train)
+
+```
+
+```{python}
+# Predicted class labels
+y_pred_log = log_reg.predict(X_test_scaled)
+
+# Predicted probabilities for positive class (treatment = 1)
+y_prob_log = log_reg.predict_proba(X_test_scaled)[:, 1]
+
+```
+
+Model Evaluation
+
+```{python, echo=FALSE}
+
+#  Confusion matrix
+cm_log = confusion_matrix(y_test, y_pred_log)
+print("Confusion Matrix:")
+print(cm_log)
+
+#TN(True Negative) FP(False Positive)
+#FN(False Negative) TP(True Positive)
+
+```
+
+```{python,include=FALSE }
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred_log))
+```
+
+#### Accuracy
+
+```{python,include=FALSE}
+acc_log = accuracy_score(y_test, y_pred_log)
+print("\nAccuracy:", acc_log)
+```
+
+#### Logistic regression coefficients
+
+```{python, echo=FALSE}
+features = [
+    'Age', 'Gender', 'self_employed', 'family_history',
+    'remote_work', 'tech_company', 'benefits', 'care_options',
+    'wellness_program', 'seek_help', 'anonymity',
+    'work_interfere_Often', 'work_interfere_Rarely',
+    'work_interfere_Sometimes', 'work_interfere_Unknown',
+    'Country_US'
+]
+
+coef_df = pd.DataFrame({
+    'feature': ['intercept'] + features,  # replace 'features' with your feature list
+    'coefficient': np.concatenate(([log_reg.intercept_[0]], log_reg.coef_[0]))
+})
+
+print("\nCoefficients:")
+print(coef_df)
+```
+
+#### Interpretation of Coefficients
+
+“Positive coefficients indicate predictors that increase the likelihood of seeking treatment, while negative coefficients reduce that likelihood. Coefficients near zero have minimal impact.”
+
+Work_interference and Family history have the highest positive coefficent
+
+when we interpret the coefficient of Work_Interference because we have 4 dummy variables.
+
+The baseline for this column is Work_interfere_Never, Each dummy coefficient shows how that category compares to the baseline (“Never”).
+
+-   work_interfere_Sometimes = 1.282303, Strongest positive
+
+    Respondents whose mental health *sometimes* interferes with work are **much more likely** to seek treatment compared to those who report **no interference**. same as work_interfere_Often = 1.054456
+
+-   work_interfere_Unknown = –1.00
+
+    Respondents who skipped or refused to answer the question (“Unknown”) are much **less** likely to have sought treatment.
+
+### LDA
+
+```{python, echo=FALSE}
+# --- Linear Discriminant Analysis (LDA) ---
+
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+# create lda model
+lda = LinearDiscriminantAnalysis()
+
+# fit lda on training data
+lda.fit(X_train_scaled, y_train)
+
+# predicted class labels
+y_pred_lda = lda.predict(X_test_scaled)
+
+# predicted probabilities (select probability of class '1' = treatment)
+y_prob_lda = lda.predict_proba(X_test_scaled)[:, 1]
+
+# compute accuracy
+acc_lda = accuracy_score(y_test, y_pred_lda)
+
+# show accuracy
+print("LDA Accuracy:", acc_lda)
+
+```
+
+```{python, echo=FALSE}
+# compute confusion matrix
+cm_lda = confusion_matrix(y_test, y_pred_lda)
+
+# show confusion matrix
+print("Confusion Matrix (LDA):")
+print(cm_lda)
+
+```
+
+#### Classification Reports (Logistic vs LDA)
+
+```{python, echo=FALSE}
+# Logistic Regression
+print("Logistic Regression:\n",
+      classification_report(
+          y_test, y_pred_log,
+          target_names=['No Treatment', 'Treatment']
+      ))
+
+# LDA
+print("LDA:\n",
+      classification_report(
+          y_test, y_pred_lda,
+          target_names=['No Treatment', 'Treatment']
+      ))
+
+```
+
+```{python, include=FALSE}
+# compute auc values for each model
+auc_log = roc_auc_score(y_test, y_prob_log)
+auc_lda = roc_auc_score(y_test, y_prob_lda)
+
+# display auc values
+auc_log, auc_lda
+
+```
+
+```{python, echo=FALSE}
+# build summary table of performances
+summary_df = pd.DataFrame({
+    'model': ['Logistic Regression', 'LDA'],
+    'test_accuracy': [acc_log, acc_lda],
+    'test_auc': [auc_log, auc_lda]
+})
+
+# display performance summary
+summary_df
+
+```
+
+### Bootstrap analysis for the two models 
+
+```{python, include =FALSE}
+import numpy as np
+from sklearn.utils import resample
+from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+# convert X, y to numpy arrays so X[boot_idx] works row-wise
+X_np = X.values
+y_np = y.values
+
+# instantiate models A and B  (Logistic vs LDA)
+modelA = LogisticRegression(max_iter=1000, solver='liblinear');None   # Logistic Regression
+modelB = LinearDiscriminantAnalysis();100 ;None                           # LDA
+
+n = len(y_np)
+B = 500   # number of bootstrap replicates
+
+diffs = []   # store accuracy differences
+
+for _ in range(B):
+
+    # bootstrap sample indices
+    boot_idx = resample(range(n), replace=True, n_samples=n)
+
+    # OOB indices = points not selected
+    oob_idx = np.setdiff1d(range(n), boot_idx)
+
+    if len(oob_idx) == 0:
+        continue  # just in case all points are sampled
+
+    # split into training and OOB test
+    X_boot, y_boot = X_np[boot_idx], y_np[boot_idx]
+    X_oob,  y_oob  = X_np[oob_idx],  y_np[oob_idx]
+
+    # fit models
+    modelA.fit(X_boot, y_boot)
+    modelB.fit(X_boot, y_boot)
+
+    # predictions
+    predA = modelA.predict(X_oob)
+    predB = modelB.predict(X_oob)
+
+    # store difference in accuracy (Logistic - LDA)
+    d = accuracy_score(y_oob, predA) - accuracy_score(y_oob, predB)
+    diffs.append(d)
+
+diffs = np.array(diffs)
+
+
+
+```
+
+```{python}
+# bootstrap confidence interval
+alpha = 0.05
+ci_low, ci_high = np.percentile(diffs, [100*alpha/2, 100*(1 - alpha/2)])
+
+print("Mean accuracy difference (Logistic - LDA):", np.mean(diffs))
+print("95% CI for the accuracy difference:", (ci_low, ci_high))
+```
+
+NOTE:
+
+The bootstrap results show that LDA generally performs better than Logistic Regression.
+On average, LDA’s accuracy is about 20% higher.
+The 95% confidence interval (–0.358 to 0.008) is mostly below zero, meaning LDA almost always outperforms Logistic Regression.
+Logistic Regression may occasionally perform similarly, but overall LDA is clearly the more reliable model.
+
+### Random Forest Classification
+
+```{python, include =FALSE }
+
+
+from sklearn.ensemble import RandomForestClassifier
+
+# create random forest model
+rf = RandomForestClassifier(
+    n_estimators=300,       # number of trees
+    max_depth=None,         # let trees grow fully
+    random_state=42
+)
+
+# fit the model
+rf.fit(X_train_scaled, y_train)
+
+# predicted class labels
+y_pred_rf = rf.predict(X_test_scaled)
+
+# predicted probabilities of class 1 (treatment)
+y_prob_rf = rf.predict_proba(X_test_scaled)[:, 1]
+
+# compute accuracy
+acc_rf = accuracy_score(y_test, y_pred_rf)
+
+print("Random Forest Accuracy:", acc_rf)
+
+```
+
+```{python, include =FALSE}
+cm_rf = confusion_matrix(y_test, y_pred_rf)
+print("Random Forest Confusion Matrix:")
+print(cm_rf)
+
+```
+
+```{python, include =FALSE}
+print("Random Forest Classification Report:\n",
+      classification_report(
+          y_test, y_pred_rf,
+          target_names=['No Treatment', 'Treatment']
+      ))
+
+```
+
+```{python, include =FALSE}
+auc_rf = roc_auc_score(y_test, y_prob_rf)
+print("Random Forest AUC:", auc_rf)
+
+```
+
+```{python, echo =FALSE}
+plt.clf()
+
+# Logistic ROC
+disp_log = RocCurveDisplay.from_predictions(
+    y_test, y_prob_log, name=None
+)
+
+# LDA ROC (same axis)
+disp_lda = RocCurveDisplay.from_predictions(
+    y_test, y_prob_lda, name=None, ax=disp_log.ax_
+)
+
+# Random Forest ROC (same axis)
+disp_rf = RocCurveDisplay.from_predictions(
+    y_test, y_prob_rf, name=None, ax=disp_log.ax_
+)
+
+# diagonal line
+plt.plot([0,1],[0,1],'--')
+
+# combined legend
+plt.legend([
+    f'Logistic (AUC = {auc_log:.3f})',
+    f'LDA (AUC = {auc_lda:.3f})',
+    f'Random Forest (AUC = {auc_rf:.3f})'
+], loc='center left', bbox_to_anchor=(1,0.5), fontsize=6, frameon=False)
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curves")
+plt.tight_layout()
+plt.show()
+
+```
+
+```{python,echo =FALSE}
+summary_df = pd.DataFrame({
+    'model': ['Logistic Regression', 'LDA', 'Random Forest'],
+    'test_accuracy': [acc_log, acc_lda, acc_rf],
+    'test_auc': [auc_log, auc_lda, auc_rf]
+})
+
+summary_df
+
+```
+
+Across all three models, Logistic Regression, LDA, and Random Forest—performance is fairly strong, with accuracy between **0.79 and 0.83** and AUC between **0.86 and 0.89**, indicating that all models are capable of distinguishing between employees who sought mental-health treatment and those who did not.
+
+1.  Linear Discriminant Analysis (LDA)
+
+-   Best overall accuracy: 0.833
+
+-   Highest AUC: 0.886
+
+-   LDA performs the strongest of the three models, suggesting that the predictors in this dataset separate the two classes (treatment vs. no treatment) fairly well under linear boundaries. The model benefits from the balanced classes and the presence of multiple binary predictors.
+
+2.  Logistic Regression
+
+-   Accuracy: 0.798
+
+-   AUC: 0.883 (very close to LDA)
+
+-   Logistic Regression performs similarly well in ranking predictions (AUC), but slightly worse in accuracy. This suggests that although Logistic Regression can order individuals correctly by risk, its actual classification threshold cuts slightly less effectively than LDA.
+
+3.  Random Forest
+
+-   Accuracy: 0.806
+
+-   AUC: 0.869
+
+-   Random Forest performs reasonably well, but both linear models do better. Since most predictors are simple binary variables, there may not be enough complex interactions for Random Forest to take advantage of.
+
+LDA is the strongest model overall, showing the highest accuracy and AUC. Logistic Regression follows closely, especially in AUC, meaning it still captures the underlying relationship well. Random Forest performs acceptably but does not exceed the simpler linear models, suggesting that in this dataset, linear relationships and class separation are more important than complex nonlinear patterns
