@@ -24,4 +24,4 @@ LDA proved to be the most optimal configuration for this dataset, achieving **83
 
 ![Model Performance Curves](roc_curve.png)
 
-[Back to Home](README)
+[Back to Home](index.html)
