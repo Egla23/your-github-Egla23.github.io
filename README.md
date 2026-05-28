@@ -22,6 +22,6 @@ I am a recent Data Science and Artificial Intelligence graduate specializing in 
 ---
 
 ## 📫 Get In Touch
-* **LinkedIn:** [Link to your profile](www.linkedin.com/in/egla-mekonnen-59055533a)
-* **GitHub:** [Link to your GitHub](https://github.com/Egla23)
-* **Resume:** [Download PDF (Resume.pdf)](Resume.pdf)
+* **LinkedIn:** [Egla Mekonnen](https://www.linkedin.com/in/egla-mekonnen-59055533a/)
+* **GitHub:** [Egla23](https://github.com/Egla23)
+* **Resume:** [Download PDF (Egla-Mekonnen-Resume)](Resume.pdf)
