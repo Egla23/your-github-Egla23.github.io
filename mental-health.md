@@ -1,6 +1,9 @@
 # Tech Industry Mental Health Predictor & Classifier
 
-*   **[📁 View Complete Source Code Repository](Link to your actual Mental Health Repo URL)**
+*   **[Download Complete Executive PDF Report (Final_Project_Report.pdf)](Mental-Health.pdf)**
+*   **[View Raw Quarto Source Code File (.qmd)](Mental-Health.qmd)**
+
+A statistical machine learning project analyzing the OSMI 2016 survey to predict whether tech professionals will seek mental health treatment based on workplace environments, demographics, and personal attitudes.
 
 ###  Tech stack and Library 
 *   **Language:** Python
