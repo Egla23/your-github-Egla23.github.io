@@ -1,6 +1,8 @@
 # Live Financial News Sentiment Classifier & Analytics Pipeline
 
-*   **[📁 View Complete Source Code Repository](https://github.com/Egla23/NLP--Financial-Sentiment-Predictor-)**
+*   **[View Complete Source Code Repository](https://github.com/Egla23/NLP--Financial-Sentiment-Predictor-)**
+
+An automated NLP data pipeline that ingests live macro catalysts from Yahoo Finance RSS feeds, extracts structured trading signals using generative AI, and compiles a comprehensive performance dashboard.
 
 ### Tech Stack and Libraries 
 *   **Language:** Python
