@@ -1,4 +1,4 @@
-<h1 style="font-size: 40px; margin-top: 20px;"> Tech Industry Mental Health Predictor & Classifier</h1>
+<h1 style="font-size: 45px; margin-top: 20px;"> Tech Industry Mental Health Predictor & Classifier</h1>
 
 
 *   **[Download Complete Executive PDF Report (Final_Project_Report.pdf)](Mental-Health.pdf)**
