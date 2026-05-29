@@ -1,4 +1,4 @@
-<h1 style="font-size: 50px; margin-top: 20px;">REEL Vendor Network Chatbot & Recommendation Engine</h1>
+<h1 style="font-size: 45px; margin-top: 20px;">REEL Vendor Network Chatbot & Recommendation Engine</h1>
 
 *   **[Live Webpage](https://reelvendorbot.streamlit.app/)**
 *   **[Complete Source Code Repository](https://github.com/Egla23/REEL)**
