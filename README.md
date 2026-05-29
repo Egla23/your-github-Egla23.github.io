@@ -14,7 +14,7 @@ Below are my featured projects showcasing my ability to leverage APIs like Gemin
     *Python | LangChain | Gemini 2.5 Flash | Matplotlib*
     Real-time NLP data pipeline transforming raw financial streams into machine-readable alpha signals.
 
-*   **[REEL Vendor Network Chatbot & Recommendation Engine](reel-network.md)**
+*   **[REEL Vendor Network Chatbot & Recommendation Engine](/REEL-Vendor-Recommendation.md)**
     *Python | Streamlit | Gemini 2.5 Flash*
     A multimodal assistant leveraging vision and text inputs to deliver targeted local vendor recommendations.
 
