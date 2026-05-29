@@ -5,7 +5,7 @@
   
   <!-- This is your title, sitting to the right -->
   <div>
-    <h1 style="font-size: 36px; margin-top: 0; line-height: 1.2;">Egla Mekonnen | <br>Data Science & AI Portfolio</h1>
+    <h1 style="font-size: 36px; margin-top: 0; line-height: 1.2;">Egla Mekonnen  <br>Data Science <br>& AI Portfolio</h1>
   </div>
 
 </div>
