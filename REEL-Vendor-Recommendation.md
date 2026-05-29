@@ -19,4 +19,4 @@
 Lowers the operational barrier to entry for local, independent small businesses by connecting them with perfectly aligned leads. It automates the initial client discovery process, replacing tedious sorting and filtering with a seamless, conversational search interface.
 
 
-[Back to Home](README)
+[Back to Home](index.html)
