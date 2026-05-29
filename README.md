@@ -1,3 +1,7 @@
+<center>
+    <img src="Egla_Mekonnen-3.jpg" alt="Egla Mekonnen" width="200" height="200" style="border-radius: 50%; object-fit: cover;">
+</center>
+
 <h1 style="font-size: 45px; margin-top: 20px; padding-left: 40px; line-height: 1.2;">Egla Mekonnen <br>Data Science & AI Portfolio</h1>
 
 
