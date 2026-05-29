@@ -1,10 +1,13 @@
 #  Egla Mekonnen | Data Science & AI Portfolio
 
-I am a recent graduate from Rhode Island College with a double major in Data Science and Artificial Intelligence, graduating Magna Cum Laude and as a member of the Upsilon Pi Epsilon (UPE) honor society. I am eager to contribute my technical foundation spanning from data exploration, machine learning model training, and , multimodal AI applications and BI dashboards.
 
-My professional experience includes driving responsible AI adoption, such as developing an AI usage playbook and literacy rollout during my internal audit internship at Citizens Bank. I am deeply passionate about AI safety, data storytelling, and bridging the gap between complex datasets and actionable corporate strategy. 
+---
 
-Below are my featured projects showcasing my ability to leverage APIs like Gemini 2.5 Flash and frameworks like Python, R, and Tableau to turn data into production-ready tools.
+I am a recent graduate of Rhode Island College with a double major in Data Science and Artificial Intelligence, earning high academic honors and membership in the Upsilon Pi Epsilon (UPE) honor society. I am experienced in high-level statistical analysis,  machine learning model training, and the fine-tuning of advanced models.
+
+Beyond the technical pipeline, I am deeply passionate about the responsible adoption of AI and effective data storytelling. My focus is on bridging the gap between complex datasets and actionable corporate strategy, ensuring that predictive models and multimodal applications are not only highly accurate but also ethically governed and practically deployable.
+
+Below are my featured projects, which demonstrate my ability to use LLMs such as Gemini 2.5 Flash at a production level, alongside core data science tools like Python, RStudio, and Tableau, to transform raw data into insightful, production-ready solutions.
 
 ---
 
