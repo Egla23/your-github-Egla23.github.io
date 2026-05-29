@@ -1,8 +1,16 @@
-<center>
-    <img src="Egla_Mekonnen-3.jpg" alt="Egla Mekonnen" width="200" height="200" style="border-radius: 50%; object-fit: cover;">
-</center>
+<div style="display: flex; align-items: center; gap: 40px; margin-bottom: 30px;">
+  
+  <!-- This is the larger, circular headshot -->
+  <img src="Egla_Mekonnen-3.jpg" alt="Egla Mekonnen" width="250" height="250" style="border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+  
+  <!-- This is your title, sitting to the right -->
+  <div>
+    <h1 style="font-size: 36px; margin-top: 0; line-height: 1.2;">Egla Mekonnen | <br>Data Science & AI Portfolio</h1>
+  </div>
 
-<h1 style="font-size: 45px; margin-top: 20px; padding-left: 40px; line-height: 1.2;">Egla Mekonnen <br>Data Science & AI Portfolio</h1>
+</div>
+
+
 
 
 ---
