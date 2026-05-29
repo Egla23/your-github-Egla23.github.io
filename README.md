@@ -1,6 +1,7 @@
 <h1 style="font-size: 36px; margin-top: 20px;">Egla Mekonnen | Data Science & AI Portfolio</h1>
 
 
+
 ---
 
 I am a recent graduate of Rhode Island College with a double major in Data Science and Artificial Intelligence, earning high academic honors and membership in the Upsilon Pi Epsilon (UPE) honor society. I am experienced in high-level statistical analysis,  machine learning model training, and the fine-tuning of advanced models.
