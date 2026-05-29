@@ -1,4 +1,4 @@
-<h1 style="font-size: 40px; margin-top: 20px;">Live Financial News Sentiment Classifier & Analytics Pipeline</h1>
+<h1 style="font-size: 45px; margin-top: 20px;">Live Financial News Sentiment Classifier & Analytics Pipeline</h1>
 
 
 *   **[Source Code Repository](https://github.com/Egla23/NLP--Financial-Sentiment-Predictor-)**
