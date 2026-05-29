@@ -1,4 +1,4 @@
-<h1 style="font-size: 45px; margin-top: 20px;">    Egla Mekonnen  <br>Data Science & AI Portfolio</h1>
+<h1 style="font-size: 45px; margin-top: 20px;">    Egla Mekonnen  <br><br>Data Science & AI Portfolio</h1>
 
 
 ---
