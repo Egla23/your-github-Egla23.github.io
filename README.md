@@ -1,15 +1,36 @@
-<div style="display: flex; align-items: center; gap: 40px; margin-bottom: 30px;">
+
+<style>
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 30px;
+  }
+  .profile-title {
+    white-space: nowrap;
+  }
+  /* This part tells phones to stack the image and text */
+  @media (max-width: 768px) {
+    .profile-header {
+      flex-direction: column;
+      text-align: center;
+      gap: 20px;
+    }
+    .profile-title {
+      white-space: normal; /* Lets it wrap slightly if the phone is super small */
+    }
+  }
+</style>
+
+<div class="profile-header">
   
-  <!-- This is the larger, circular headshot -->
-  <img src="Egla_Mekonnen-3.jpg" alt="Egla Mekonnen" width="250" height="250" style="border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+  <img src="profile.jpg" alt="Egla Mekonnen" width="250" height="250" style="border-radius: 50%; object-fit: cover; flex-shrink: 0;">
   
-  <!-- Two separate lines that will never break -->
-  <div style="white-space: nowrap;">
+  <div class="profile-title">
     <h1 style="font-size: 36px; margin-top: 0; line-height: 1.2;">Egla Mekonnen<br>Data Science & AI Portfolio</h1>
   </div>
 
 </div>
-
 
 
 
