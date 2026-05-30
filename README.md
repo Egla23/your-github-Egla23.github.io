@@ -24,7 +24,7 @@
 
 <div class="profile-header">
   
-  <img src="profile.jpg" alt="Egla Mekonnen" width="250" height="250" style="border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+  <img src="Egla_Mekonnen-3.jpg" alt="Egla Mekonnen" width="250" height="250" style="border-radius: 50%; object-fit: cover; flex-shrink: 0;">
   
   <div class="profile-title">
     <h1 style="font-size: 36px; margin-top: 0; line-height: 1.2;">Egla Mekonnen<br>Data Science & AI Portfolio</h1>
