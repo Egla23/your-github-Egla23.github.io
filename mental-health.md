@@ -11,6 +11,10 @@ A statistical machine learning project analyzing the OSMI 2016 survey to predict
 *   **Libraries:** Pandas, Scikit-Learn, NumPy, Matplotlib
 *   **Environment:** RStudio / Python execution workspace
 
+### Correlation between Predictors 
+<img width="1031" height="810" alt="Screenshot 2026-05-29 at 8 47 07 pm" src="https://github.com/user-attachments/assets/45175b49-e26d-4371-8f0c-82015b4cdf2a" />
+
+
 ###  Core Architecture
 *  **Feature Engineering & Preprocessing:** Cleaned a 1,259-row dataset by isolating 27 variables, imputing missing values, mapping categorical baseline references, applying one-hot encoding, and scaling numeric predictors.
 *  **Multi-Model Classification Pipeline:** Built, trained, and tested three distinct predictive algorithms to find the optimal fit for the binary target variable: Logistic Regression, Linear Discriminant Analysis (LDA), and Random Forest.
