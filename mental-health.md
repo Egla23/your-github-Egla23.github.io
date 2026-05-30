@@ -23,5 +23,6 @@ Provides HR departments and corporate leadership with an empirical framework to 
 ### Model Evaluation & Metrics
 LDA proved to be the most optimal configuration for this dataset, achieving **83.3% test accuracy** and a **0.886 AUC**. Below are the comparative performance curves:
 
+<img width="908" height="542" alt="Screenshot 2026-05-29 at 8 40 53 pm" src="https://github.com/user-attachments/assets/000610cf-c7f5-4d14-92c1-b07e9f850e58" />
 
 [Back to Home](index.html)
