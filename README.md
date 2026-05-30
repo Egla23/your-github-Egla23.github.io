@@ -43,3 +43,4 @@ Below are my featured projects, which demonstrate my ability to use LLMs such as
 * **LinkedIn:** [Egla Mekonnen](https://www.linkedin.com/in/egla-mekonnen-59055533a/)
 * **GitHub:** [Egla23](https://github.com/Egla23)
 * **Resume:** [Download PDF (Egla-Mekonnen-Resume)](Egla_Mekonnen_Resume.pdf)
+  
